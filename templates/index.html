@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>✨ IMAGE FX STUDIO ✨</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+        }
+        .container {
+            display: flex;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .image-container {
+            flex: 1;
+            text-align: center;
+        }
+        .image-box {
+            border: 2px solid #4cc9f0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: #16213e;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        img {
+            max-width: 100%;
+            max-height: 450px;
+            display: block;
+            margin: 15px auto;
+            border-radius: 5px;
+        }
+        .controls {
+            margin: 25px 0;
+            padding: 20px;
+            background: #16213e;
+            border-radius: 12px;
+            border: 1px solid #4cc9f0;
+        }
+        .effect-controls {
+            display: none;
+        }
+        .active-effect {
+            display: block;
+        }
+        .download-btn {
+            background-color: #4cc9f0;
+            border: none;
+            color: #1a1a2e;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(76, 201, 240, 0.3);
+            transition: all 0.3s;
+        }
+        .download-btn:hover {
+            background-color: #3a86ff;
+            transform: translateY(-2px);
+        }
+        .effect-btn {
+            background-color: #f72585;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .effect-btn:hover {
+            background-color: #b5179e;
+            transform: translateY(-2px);
+        }
+        .effect-btn.active {
+            background-color: #7209b7;
+            transform: scale(1.05);
+        }
+        h1, h3 {
+            color: #4cc9f0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #4cc9f0;
+            outline: none;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 2px dashed #4cc9f0;
+            display: inline-block;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .custom-file-upload:hover {
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>✨ IMAGE FX STUDIO ✨</h1>
+
+    <label for="fileInput" class="custom-file-upload">
+        🚀 UPLOAD IMAGE
+    </label>
+    <input type="file" id="fileInput" accept="image/*">
+
+    <div class="effect-buttons">
+        <button class="effect-btn active" data-effect="pixelate">🟦 PIXELATE</button>
+        <button class="effect-btn" data-effect="glitch">📟 GLITCH FX</button>
+    </div>
+
+    <div class="controls">
+        <div id="pixelate-controls" class="effect-controls active-effect">
+            <div class="slider-container">
+                <label for="pixelSize">🔘 PIXEL SIZE: <span id="pixelSizeValue">10</span>px</label>
+                <input type="range" id="pixelSize" min="2" max="20" value="10" step="1">
+            </div>
+        </div>
+
+        <div id="glitch-controls" class="effect-controls">
+            <div class="slider-container">
+                <label for="glitchIntensity">🌀 GLITCH POWER: <span id="glitchIntensityValue">5</span></label>
+                <input type="range" id="glitchIntensity" min="1" max="10" value="5" step="1">
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="imageContainer" style="display: none;">
+        <div class="image-container">
+            <div class="image-box">
+                <h3>🖼️ ORIGINAL</h3>
+                <img id="originalImage">
+            </div>
+        </div>
+        <div class="image-container">
+            <div class="image-box">
+                <h3 id="effectTitle">🟦 PIXELATED</h3>
+                <img id="processedImage">
+                <a id="downloadBtn" class="download-btn">💾 DOWNLOAD</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Весь JavaScript код остается без изменений
+        const fileInput = document.getElementById('fileInput');
+        const effectButtons = document.querySelectorAll('.effect-btn');
+        const pixelateControls = document.getElementById('pixelate-controls');
+        const glitchControls = document.getElementById('glitch-controls');
+        const pixelSizeSlider = document.getElementById('pixelSize');
+        const pixelSizeValue = document.getElementById('pixelSizeValue');
+        const glitchIntensitySlider = document.getElementById('glitchIntensity');
+        const glitchIntensityValue = document.getElementById('glitchIntensityValue');
+        const originalImage = document.getElementById('originalImage');
+        const processedImage = document.getElementById('processedImage');
+        const effectTitle = document.getElementById('effectTitle');
+        const imageContainer = document.getElementById('imageContainer');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        let currentImage = null;
+        let currentEffect = 'pixelate';
+
+        effectButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                effectButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                currentEffect = this.dataset.effect;
+                effectTitle.textContent = this.textContent.replace('🟦', '').replace('📟', '') + ' IMAGE';
+
+                pixelateControls.classList.remove('active-effect');
+                glitchControls.classList.remove('active-effect');
+
+                if (currentEffect === 'pixelate') {
+                    pixelateControls.classList.add('active-effect');
+                    effectTitle.innerHTML = '🟦 PIXELATED';
+                } else if (currentEffect === 'glitch') {
+                    glitchControls.classList.add('active-effect');
+                    effectTitle.innerHTML = '📟 GLITCHED';
+                }
+
+                if (currentImage) {
+                    processImage();
+                }
+            });
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length === 0) return;
+
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                originalImage.src = event.target.result;
+                currentImage = event.target.result;
+                processImage();
+                imageContainer.style.display = 'flex';
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        pixelSizeSlider.addEventListener('input', function() {
+            pixelSizeValue.textContent = this.value;
+            if (currentImage && currentEffect === 'pixelate') {
+                processImage();
+            }
+        });
+
+        glitchIntensitySlider.addEventListener('input', function() {
+            glitchIntensityValue.textContent = this.value;
+            if (currentImage && currentEffect === 'glitch') {
+                processImage();
+            }
+        });
+
+        function processImage() {
+            let params = {
+                image: currentImage,
+                effect_type: currentEffect
+            };
+
+            if (currentEffect === 'pixelate') {
+                params.block_size = parseInt(pixelSizeSlider.value);
+            } else if (currentEffect === 'glitch') {
+                params.intensity = parseInt(glitchIntensitySlider.value);
+            }
+
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => response.json())
+            .then(data => {
+                processedImage.src = `data:image/png;base64,${data.processed_image}`;
+                downloadBtn.href = `data:image/png;base64,${data.processed_image}`;
+                downloadBtn.download = `${currentEffect}_image.png`;
+            });
+        }
+    </script>
+</body>
+</html>
